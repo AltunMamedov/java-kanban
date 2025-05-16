@@ -1,27 +1,45 @@
 package Tasks;
 
 import java.util.ArrayList;
-import java.util.Objects;
+
 
 public class EpicTask extends Task {
-    private ArrayList<Integer> subtaskId;
+    private ArrayList<Integer> subtaskIds;
 
     public EpicTask(String name, String description) {
-        super(name, description);
-        this.subtaskId = new ArrayList<>();
+        super(name, description, Status.NEW); /*Из условия следует,
+        что у EpicTask всегда при создании Status.NEW*/
+        this.subtaskIds = new ArrayList<>();
     }
 
     public void addSubtaskId(int subtaskId) {
-        this.subtaskId.add(subtaskId);
+        this.subtaskIds.add(subtaskId);
     }
 
     public ArrayList<Integer> getSubtaskId() {
-        return subtaskId;
+        return new ArrayList<>(subtaskIds);
     }
 
-    public void setSubtaskId(ArrayList<Integer> subtaskId) {
-        this.subtaskId = subtaskId;
+    /*в этот класс нужно добавить два метода
+1) удалит единичную подзадачу из хранилища subTasks
+2) очистит все данные хранилища subTasks*/
+
+    public void deleteSubtaskId(int subtaskId) {
+        subtaskIds.remove(Integer.valueOf(subtaskId));
     }
 
+    public void deleteAllSubTasks() {
+        subtaskIds.clear();
+    }
 
+    //удален метод setSubtaskId(ArrayList<Integer> subtaskId) {}
+
+    @Override
+    public String toString() {
+        return "EpicTask{id=" + getId() +
+                ", name='" + getName() + '\'' +
+                ", status=" + getStatus() +
+                ", subtasks=" + subtaskIds +
+                '}';
+    }
 }

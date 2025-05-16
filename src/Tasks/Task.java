@@ -9,10 +9,12 @@ public class Task {
     private Status status;
 
 
-    public Task(String name, String description) {
+    public Task(String name, String description, Status status) {
         this.name = name;
         this.description = description;
-        this.status = Status.NEW;
+        this.status = status;
+        /*Изменен способ создания задач через конструктор.
+        Теперь статус задается пользователем.*/
     }
 
     public int getId() {
@@ -60,5 +62,13 @@ public class Task {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Task{id=" + id +
+                ", name='" + name + '\'' +
+                ", status=" + status +
+                '}';
     }
 }
