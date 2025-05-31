@@ -16,9 +16,10 @@ public class Main {
 
         // Создаем подзадачи
         SubTask subTask1 = new SubTask("Упаковать книги", "Коробки для книг", Status.NEW, epic.getId());
-        manager.addNewSubtask(subTask1);
+        subTask1 = manager.addNewSubtask(subTask1);
+
         SubTask subTask2 = new SubTask("Заказать грузовик", "Грузоподъемность 2 тонны", Status.NEW, epic.getId());
-        manager.addNewSubtask(subTask2);
+        subTask2 = manager.addNewSubtask(subTask2);
 
         // Проверяем статус эпика (NEW)
         System.out.println("\nСтатус эпика после создания подзадач: " + epic.getStatus());

@@ -5,17 +5,18 @@ import Tasks.SubTask;
 import Tasks.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public interface TaskManager {
     // Для эпиков
-    ArrayList<EpicTask> getAllEpics();
+    List<EpicTask> getAllEpics();
 
     // Для подзадач
-    ArrayList<SubTask> getAllSubtasks();
+    List<SubTask> getAllSubtasks();
 
     // Для обычных задач
-    ArrayList<Task> getAllTasks();
+    List<Task> getAllTasks();
 
     // Для эпиков
     void deleteAllEpics();
@@ -62,10 +63,10 @@ public interface TaskManager {
     // Для подзадач
     void deleteSubtaskById(int id);
 
-    ArrayList<SubTask> getSubtasksByEpicId(int epicId);
+    List<SubTask> getSubtasksByEpicId(int epicId);
 
     Task getAnyTaskById(int id);
 
-    ArrayList<Task> getHistory();
+    List<Task> getHistory();
 
 }

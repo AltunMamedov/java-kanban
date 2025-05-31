@@ -7,28 +7,25 @@ import Tasks.Task;
 
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
-    private int newId = 1;
-
-    @Override
-    public ArrayList<Task> getHistory() {
-        return new ArrayList<>(historyManager.getHistory());
-    }
-
+    private final HashMap<Integer, Task> tasks = new HashMap<>();
+    private final HashMap<Integer, SubTask> subtasks = new HashMap<>();
+    private final HashMap<Integer, EpicTask> epics = new HashMap<>();
     private final HistoryManager historyManager;
+
+    private int newId = 1;
 
     public InMemoryTaskManager() {
         this.historyManager = Managers.getDefaultHistory();
     }
 
-    private int generateId() {
-        return newId++;
+    @Override
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
     }
 
-    private final HashMap<Integer, Task> tasks = new HashMap<>();
-    private final HashMap<Integer, SubTask> subtasks = new HashMap<>();
-    private final HashMap<Integer, EpicTask> epics = new HashMap<>();
 
     @Override
     public ArrayList<EpicTask> getAllEpics() {
@@ -68,7 +65,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public EpicTask getEpicById(int id) {
         EpicTask epicTask = epics.get(id);
-        if(epicTask!=null){
+        if (epicTask != null) {
             historyManager.add(epicTask);
         }
         return epicTask;
@@ -86,7 +83,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public SubTask getSubTaskById(int id) {
         SubTask subTask = subtasks.get(id);
-        if(subTask!=null){
+        if (subTask != null) {
             historyManager.add(subTask);
         }
         return subTask;
@@ -201,6 +198,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (tasks.containsKey(id)) return tasks.get(id);
         if (subtasks.containsKey(id)) return subtasks.get(id);
         return epics.get(id);
+    }
+
+    private int generateId() {
+        return newId++;
     }
 
     private void updateEpicStatus(int epicId) {
