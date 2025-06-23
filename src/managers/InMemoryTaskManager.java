@@ -1,9 +1,9 @@
-package Managers;
+package managers;
 
-import Tasks.EpicTask;
-import Tasks.Status;
-import Tasks.SubTask;
-import Tasks.Task;
+import tasks.EpicTask;
+import tasks.Status;
+import tasks.SubTask;
+import tasks.Task;
 
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -44,22 +44,33 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllEpics() {
+        for (EpicTask epic : epics.values()) {
+            historyManager.remove(epic.getId());
+        }
+        for (SubTask subtask : subtasks.values()) {
+            historyManager.remove(subtask.getId());
+        }
         epics.clear();
-        subtasks.clear(); //добавлено удаление всех подзадач
+        subtasks.clear();
     }
+
 
     @Override
     public void deleteAllTasks() {
+        for (Task task : tasks.values()) {
+            historyManager.remove(task.getId());
+        }
         tasks.clear();
     }
 
+
     @Override
     public void clearAllSubTasks() {
-        subtasks.clear();
-        for (EpicTask epic : epics.values()) {
-            epic.deleteAllSubTasks(); // очищение внутренних хранилищ
-            updateEpicStatus(epic.getId()); // обновление статуса Эпика
+        for (SubTask subTask : subtasks.values()) {
+            historyManager.remove(subTask.getId());
         }
+        subtasks.clear();
+
     }
 
     @Override
@@ -154,13 +165,16 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic != null) {
             for (int subtaskId : epic.getSubtaskId()) {
                 subtasks.remove(subtaskId);
+                historyManager.remove(subtaskId);
             }
+            historyManager.remove(id);
         }
     }
 
     @Override
     public void deleteTaskById(int id) {
         tasks.remove(id);
+        historyManager.remove(id);
     }
 
     @Override
@@ -173,6 +187,7 @@ public class InMemoryTaskManager implements TaskManager {
                 updateEpicStatus(epic.getId());
             }
         }
+        historyManager.remove(id);
     }
 
     @Override

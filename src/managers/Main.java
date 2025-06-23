@@ -1,8 +1,8 @@
-package Managers;
+package managers;
 
-import Tasks.EpicTask;
-import Tasks.Status;
-import Tasks.SubTask;
+import tasks.EpicTask;
+import tasks.Status;
+import tasks.SubTask;
 
 public class Main {
 
