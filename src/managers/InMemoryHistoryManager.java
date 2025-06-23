@@ -55,8 +55,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             next.prev = prev;
         }
 
-        node.next = null;
-        node.prev = null;// Обнулим ссылки у node
+
     }
 
     @Override
@@ -64,8 +63,8 @@ public class InMemoryHistoryManager implements HistoryManager {
         Node node = nodeMap.get(id);
         if (node != null) {
             removeNode(node);
+            nodeMap.remove(id);
         }
-        nodeMap.remove(id);
     }
 
 
