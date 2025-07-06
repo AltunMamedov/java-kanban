@@ -14,6 +14,13 @@ public class Task {
         this.description = description;
         this.status = Status.NEW;
     }
+    public Task(int id, String name, String description, Status status) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.status = status;
+    }
+
 
     public int getId() {
         return id;
@@ -60,5 +67,16 @@ public class Task {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%d,%s,%s,%s,%s,",
+                getId(),
+                TaskType.TASK,
+                getName(),
+                getStatus(),
+                getDescription()
+        );
     }
 }
