@@ -4,13 +4,17 @@ import tasks.*;
 
 import java.io.*;
 
+@SuppressWarnings({"checkstyle:Indentation", "checkstyle:MissingJavadocType"})
 public class FileBackedTaskManager extends InMemoryTaskManager {
+    @SuppressWarnings("checkstyle:Indentation")
     private final File file;
 
+    @SuppressWarnings({"checkstyle:Indentation", "checkstyle:MissingJavadocMethod"})
     public FileBackedTaskManager(File file) {
         this.file = file;
     }
 
+    @SuppressWarnings("checkstyle:Indentation")
     private void save() {
         try (FileWriter writer = new FileWriter(file)) {
             writer.write("id,type,name,status,description,epic\n");
@@ -32,9 +36,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
+    @SuppressWarnings("checkstyle:Indentation")
     static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
-        try (BufferedReader reader = new BufferedReader(new FileReader(file));) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line = reader.readLine();
 
             while ((line = reader.readLine()) != null) {
@@ -57,6 +62,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     }
 
+    @SuppressWarnings({"checkstyle:Indentation", "checkstyle:MissingSwitchDefault"})
     private static Task fromString(String line) {
         String[] fields = line.split(",");
         int id = Integer.parseInt(fields[0]);
@@ -68,12 +74,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         Task taskFromFile = null;
 
         switch (type) {
-            case TASK -> {
-                taskFromFile = new Task(id, name, description, status);
-            }
-            case EPIC -> {
-                taskFromFile = new EpicTask(id, name, description, status);
-            }
+            case TASK -> taskFromFile = new Task(id, name, description, status);
+            case EPIC -> taskFromFile = new EpicTask(id, name, description, status);
             case SUBTASK -> {
                 if (fields.length <= 5) {
                     throw new IllegalArgumentException("Не хватает поля epicId в строке: " + line);
@@ -88,6 +90,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return taskFromFile;
     }
 
+    @SuppressWarnings("checkstyle:Indentation")
     @Override
     public Task addNewTask(Task task) {
         Task result = super.addNewTask(task);
@@ -95,6 +98,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return result;
     }
 
+    @SuppressWarnings("checkstyle:Indentation")
     @Override
     public EpicTask addNewEpic(EpicTask epic) {
         EpicTask result = super.addNewEpic(epic);
@@ -102,6 +106,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return result;
     }
 
+    @SuppressWarnings("checkstyle:Indentation")
     @Override
     public SubTask addNewSubtask(SubTask subtask) {
         SubTask result = super.addNewSubtask(subtask);
@@ -109,36 +114,42 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return result;
     }
 
+    @SuppressWarnings("checkstyle:Indentation")
     @Override
     public void updateTask(Task task) {
         super.updateTask(task);
         save();
     }
 
+    @SuppressWarnings("checkstyle:Indentation")
     @Override
     public void updateEpic(EpicTask newEpic) {
         super.updateEpic(newEpic);
         save();
     }
 
+    @SuppressWarnings("checkstyle:Indentation")
     @Override
     public void updateSubTask(SubTask newSubtask) {
         super.updateSubTask(newSubtask);
         save();
     }
 
+    @SuppressWarnings("checkstyle:Indentation")
     @Override
     public void deleteTaskById(int id) {
         super.deleteTaskById(id);
         save();
     }
 
+    @SuppressWarnings("checkstyle:Indentation")
     @Override
     public void deleteEpicById(int id) {
         super.deleteEpicById(id);
         save();
     }
 
+    @SuppressWarnings("checkstyle:Indentation")
     @Override
     public void deleteSubtaskById(int id) {
         super.deleteSubtaskById(id);
