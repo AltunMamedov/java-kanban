@@ -10,11 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
-    @SuppressWarnings("checkstyle:Indentation")
-    protected final HashMap<Integer, Task> tasks = new HashMap<>();
+        protected final HashMap<Integer, Task> tasks = new HashMap<>();
     protected final HashMap<Integer, SubTask> subtasks = new HashMap<>();
     protected final HashMap<Integer, EpicTask> epics = new HashMap<>();
     private final HistoryManager historyManager;
+
+
 
     private int newId = 1;
 
@@ -22,6 +23,9 @@ public class InMemoryTaskManager implements TaskManager {
         this.historyManager = Managers.getDefaultHistory();
     }
 
+    public void setNewId(int newId) {
+        this.newId = newId;
+    }
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
