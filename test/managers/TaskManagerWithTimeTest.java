@@ -70,11 +70,11 @@ public class TaskManagerWithTimeTest {
         task2.setStartTime(LocalDateTime.of(2025, 7, 20, 10, 30)); // перекрывается с task1
         task2.setDuration(Duration.ofMinutes(30));
 
-        boolean overlaps = ((InMemoryTaskManager) manager).isTaskOverlapping(task2);
+        boolean overlaps = manager.isTaskOverlapping(task2);
         assertTrue(overlaps, "Задачи пересекаются по времени");
 
         task2.setStartTime(LocalDateTime.of(2025, 7, 20, 11, 1)); // не пересекается
-        overlaps = ((InMemoryTaskManager) manager).isTaskOverlapping(task2);
+        overlaps = manager.isTaskOverlapping(task2);
         assertFalse(overlaps, "Задачи не пересекаются");
     }
 
@@ -90,7 +90,7 @@ public class TaskManagerWithTimeTest {
         task2.setDuration(Duration.ofMinutes(30));
 
 
-        if (((InMemoryTaskManager) manager).isTaskOverlapping(task2)) {
+        if (manager.isTaskOverlapping(task2)) {
 
             assertNull(manager.getTaskById(task2.getId()), "Задача не должна быть добавлена из-за пересечения");
         } else {
