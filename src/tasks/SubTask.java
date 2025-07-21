@@ -1,5 +1,7 @@
 package tasks;
 
+import java.time.LocalDateTime;
+
 public class SubTask extends Task {
     private int epicId;
 
@@ -15,6 +17,13 @@ public class SubTask extends Task {
 
     public int getEpicId() {
         return epicId;
+    }
+
+    public LocalDateTime getEndTime() {
+        if (startTime != null && duration != null) {
+            return startTime.plus(duration);
+        }
+        return null;
     }
 
     @Override
