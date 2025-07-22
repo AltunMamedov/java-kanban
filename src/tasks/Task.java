@@ -104,12 +104,13 @@ public class Task {
 
     @Override
     public String toString() {
-        return String.format("%d,%s,%s,%s,%s,",
-                getId(),
+        return String.format("%d,%s,%s,%s,%s,%s,%s",
+                id,
                 TaskType.TASK,
-                getName(),
-                getStatus(),
-                getDescription()
-        );
+                name,
+                status,
+                description,
+                startTime != null ? startTime.toString() : "",
+                duration != null ? duration.toString() : "");
     }
 }

@@ -19,22 +19,20 @@ public class SubTask extends Task {
         return epicId;
     }
 
-    public LocalDateTime getEndTime() {
-        if (startTime != null && duration != null) {
-            return startTime.plus(duration);
-        }
-        return null;
-    }
-
     @Override
     public String toString() {
-        return String.format("%d,%s,%s,%s,%s,%d",
+        String startTimeStr = getStartTime() != null ? getStartTime().toString() : "";
+        String durationStr = getDuration() != null ? getDuration().toString() : "";
+        return String.format("%d,%s,%s,%s,%s,%d,%s,%s",
                 getId(),
                 TaskType.SUBTASK,
                 getName(),
                 getStatus(),
                 getDescription(),
-                getEpicId()
+                getEpicId(),
+                startTimeStr,
+                durationStr
         );
     }
+
 }
