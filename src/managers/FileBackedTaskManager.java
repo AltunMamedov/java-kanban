@@ -69,10 +69,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
                 if (task instanceof SubTask) {
                     manager.subtasks.put(task.getId(), (SubTask) task);
+                    manager.getPrioritizedTasks().add((SubTask) task);
                 } else if (task instanceof EpicTask) {
                     manager.epics.put(task.getId(), (EpicTask) task);
                 } else {
                     manager.tasks.put(task.getId(), task);
+                    manager.getPrioritizedTasks().add(task);
                 }
                 maxId = Math.max(maxId, task.getId());
             }
@@ -84,13 +86,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     epic.addSubtaskId(subtask.getId());
                 }
             }
-
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при загрузке файла: " + file.getName(), e);
         }
-
         return manager;
-
     }
 
     private static Task fromString(String line) {
