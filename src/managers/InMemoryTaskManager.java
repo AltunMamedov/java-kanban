@@ -385,6 +385,7 @@ public class InMemoryTaskManager implements TaskManager {
         epic.setStartTime(start);
         epic.setDuration(totalDuration);
     }
+
     protected HashMap<Integer, Task> getTasks() {
         return tasks;
     }
