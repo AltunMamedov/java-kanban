@@ -6,6 +6,7 @@ import java.util.ArrayList;
 public class EpicTask extends Task {
     private final ArrayList<Integer> subtaskIds = new ArrayList<>();
     private LocalDateTime endTime;
+    
     public EpicTask(String name, String description) {
         super(name, description, Status.NEW);
     }
