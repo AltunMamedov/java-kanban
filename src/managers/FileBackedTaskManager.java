@@ -62,19 +62,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line = reader.readLine();
+            String line = reader.readLine(); // Skip header
             int maxId = 0;
             while ((line = reader.readLine()) != null) {
                 Task task = fromString(line);
 
                 if (task instanceof SubTask) {
                     manager.subtasks.put(task.getId(), (SubTask) task);
-                    manager.getPrioritizedTasks().add((SubTask) task);
+                    manager.addToPrioritizedTasks(task); // Use protected method
                 } else if (task instanceof EpicTask) {
                     manager.epics.put(task.getId(), (EpicTask) task);
                 } else {
                     manager.tasks.put(task.getId(), task);
-                    manager.getPrioritizedTasks().add(task);
+                    manager.addToPrioritizedTasks(task); // Use protected method
                 }
                 maxId = Math.max(maxId, task.getId());
             }

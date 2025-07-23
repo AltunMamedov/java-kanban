@@ -69,7 +69,6 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.remove(epic.getId());
         }
         epics.clear();
-        subtasks.clear();
     }
 
 
@@ -92,10 +91,8 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks.clear();
         for (EpicTask epic : epics.values()) {
             epic.deleteAllSubTasks();
-            epic.setStatus(Status.NEW);
-            epic.setStartTime(null);
-            epic.setDuration(null);
-            epic.setEndTime(null);
+            updateEpicStatus(epic.getId());
+            updateEpicTimeFields(epic);
         }
     }
 
@@ -334,7 +331,7 @@ public class InMemoryTaskManager implements TaskManager {
         return false;
     }
 
-    private void addToPrioritizedTasks(Task task) {
+    protected void addToPrioritizedTasks(Task task) {
         if (task.getStartTime() != null) {
             prioritizedTasks.add(task);
         }
