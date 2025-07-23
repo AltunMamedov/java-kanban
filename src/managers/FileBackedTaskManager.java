@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File file;
@@ -21,39 +23,58 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void save() {
         try (FileWriter writer = new FileWriter(file)) {
-            writer.write("id,type,name,status,description,epic\n");
-
+            writer.write("id,type,name,status,description,epicId,startTime,duration\n");
             for (Task task : tasks.values()) {
-                writer.write(task.toString() + "\n");
+                writer.write(toStringForFile(task) + "\n");
             }
 
             for (EpicTask epic : epics.values()) {
-                writer.write(epic.toString() + "\n");
+                writer.write(toStringForFile(epic) + "\n");
             }
 
             for (SubTask subtask : subtasks.values()) {
-                writer.write(subtask.toString() + "\n");
+                writer.write(toStringForFile(subtask) + "\n");
             }
-
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при сохранении файла: " + file.getName(), e);
         }
     }
 
+    private String toStringForFile(Task task) {
+        String epicId = "";
+        if (task instanceof SubTask) {
+            epicId = String.valueOf(((SubTask) task).getEpicId());
+        }
+        String startTime = task.getStartTime() != null ? task.getStartTime().toString() : "";
+        String duration = task.getDuration() != null ? task.getDuration().toString() : "";
+
+        return String.format("%d,%s,%s,%s,%s,%s,%s,%s",
+                task.getId(),
+                TaskType.TASK,
+                task.getName(),
+                task.getStatus(),
+                task.getDescription(),
+                epicId,
+                startTime,
+                duration);
+    }
+
     public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line = reader.readLine();
+            String line = reader.readLine(); // Skip header
             int maxId = 0;
             while ((line = reader.readLine()) != null) {
                 Task task = fromString(line);
 
                 if (task instanceof SubTask) {
                     manager.subtasks.put(task.getId(), (SubTask) task);
+                    manager.addToPrioritizedTasks(task); // Use protected method
                 } else if (task instanceof EpicTask) {
                     manager.epics.put(task.getId(), (EpicTask) task);
                 } else {
                     manager.tasks.put(task.getId(), task);
+                    manager.addToPrioritizedTasks(task); // Use protected method
                 }
                 maxId = Math.max(maxId, task.getId());
             }
@@ -65,13 +86,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     epic.addSubtaskId(subtask.getId());
                 }
             }
-
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при загрузке файла: " + file.getName(), e);
         }
-
         return manager;
-
     }
 
     private static Task fromString(String line) {
@@ -81,22 +99,33 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String name = fields[2];
         Status status = Status.valueOf(fields[3]);
         String description = fields[4];
+        String epicIdStr = fields.length > 5 ? fields[5] : "";
+        String startTimeStr = fields.length > 6 ? fields[6] : "";
+        String durationStr = fields.length > 7 ? fields[7] : "";
 
-        Task taskFromFile = null;
+        LocalDateTime startTime = startTimeStr.isEmpty() ? null : LocalDateTime.parse(startTimeStr);
+        Duration duration = durationStr.isEmpty() ? Duration.ZERO : Duration.parse(durationStr);
+        Task taskFromFile;
 
         switch (type) {
-            case TASK -> taskFromFile = new Task(id, name, description, status);
-            case EPIC -> taskFromFile = new EpicTask(id, name, description, status);
+            case TASK -> {
+                taskFromFile = new Task(id, name, description, status);
+            }
+            case EPIC -> {
+                taskFromFile = new EpicTask(id, name, description, status);
+            }
             case SUBTASK -> {
-                if (fields.length <= 5) {
+                if (epicIdStr.isEmpty()) {
                     throw new IllegalArgumentException("Не хватает поля epicId в строке: " + line);
                 }
-                int epicId = Integer.parseInt(fields[5]);
+                int epicId = Integer.parseInt(epicIdStr);
                 taskFromFile = new SubTask(id, name, description, status, epicId);
             }
-
-
+            default -> throw new IllegalArgumentException("Неизвестный тип задачи: " + type);
         }
+
+        taskFromFile.setStartTime(startTime);
+        taskFromFile.setDuration(duration);
 
         return taskFromFile;
     }
