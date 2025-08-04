@@ -98,8 +98,8 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
             if (parts.length == 2) {
                 return Integer.parseInt(parts[1]);
             }
-        } catch (NumberFormatException ignored) {}
+        } catch (NumberFormatException ignored) {
+        }
         return null;
     }
-
 }
