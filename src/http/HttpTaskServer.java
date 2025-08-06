@@ -9,7 +9,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 import managers.TaskManager;
-import tasks.Status;
 
 public class HttpTaskServer {
     private static final int PORT = 8080;
@@ -21,10 +20,7 @@ public class HttpTaskServer {
         this.manager = manager;
         this.server = HttpServer.create(new InetSocketAddress(PORT), 0);
 
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                .create();
+        Gson gson = new GsonBuilder().registerTypeAdapter(Duration.class, new DurationAdapter()).registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
 
 
         server.createContext("/tasks", new TasksHandler(manager, gson));
