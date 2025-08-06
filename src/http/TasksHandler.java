@@ -42,6 +42,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                     exchange.close();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             sendServerError(exchange, "Ошибка на сервере: " + e.getMessage());
         }
     }

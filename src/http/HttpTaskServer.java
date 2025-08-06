@@ -1,11 +1,15 @@
 package http;
 
+import com.google.gson.*;
 import com.sun.net.httpserver.HttpServer;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import com.google.gson.Gson;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import managers.TaskManager;
+import tasks.Status;
 
 public class HttpTaskServer {
     private static final int PORT = 8080;
@@ -17,13 +21,17 @@ public class HttpTaskServer {
         this.manager = manager;
         this.server = HttpServer.create(new InetSocketAddress(PORT), 0);
 
-        server.createContext("/tasks", new TasksHandler(manager, new Gson()));
-        server.createContext("/epics", new EpicsHandler(manager, new Gson()));
-        server.createContext("/subtasks", new SubtasksHandler(manager, new Gson()));
-        server.createContext("/history", new HistoryHandler(manager, new Gson()));
-        server.createContext("/prioritized", new PrioritizedHandler(manager, new Gson()));
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Duration.class, new DurationAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .create();
 
 
+        server.createContext("/tasks", new TasksHandler(manager, gson));
+        server.createContext("/epics", new EpicsHandler(manager, gson));
+        server.createContext("/subtasks", new SubtasksHandler(manager, gson));
+        server.createContext("/history", new HistoryHandler(manager, gson));
+        server.createContext("/prioritized", new PrioritizedHandler(manager, gson));
     }
 
     public void start() {
@@ -36,3 +44,4 @@ public class HttpTaskServer {
         System.out.println("HTTP-сервер остановлен.");
     }
 }
+

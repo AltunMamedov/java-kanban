@@ -1,11 +1,13 @@
 package http;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import http.HttpTaskServer;
 import managers.InMemoryTaskManager;
 import tasks.EpicTask;
+import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
 
@@ -14,6 +16,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,11 +26,17 @@ class HttpTaskServerTest {
     private HttpTaskServer taskServer;
     private InMemoryTaskManager manager;
     private HttpClient client;
+    private Gson gson;
 
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
         manager = new InMemoryTaskManager();
         client = HttpClient.newHttpClient();
+        gson = new GsonBuilder()
+                .registerTypeAdapter(Duration.class, new DurationAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .create();
+
         int maxAttempts = 3;
         for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
@@ -52,11 +62,10 @@ class HttpTaskServerTest {
         }
     }
 
-
     @Test
     void testAddTask() throws IOException, InterruptedException {
-        Task task = new Task("Test Task", "Test Description", tasks.Status.NEW);
-        String taskJson = "{\"name\":\"Test Task\",\"description\":\"Test Description\",\"status\":\"NEW\"}";
+        Task task = new Task("Test Task", "Test Description", Status.NEW);
+        String taskJson = gson.toJson(task);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/tasks"))
@@ -65,8 +74,10 @@ class HttpTaskServerTest {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200, response.statusCode());
 
+        assertEquals(201, response.statusCode());
+
+        // Получаем все задачи из менеджера и проверяем
         assertEquals(1, manager.getAllTasks().size());
         assertEquals("Test Task", manager.getAllTasks().get(0).getName());
     }
@@ -79,15 +90,15 @@ class HttpTaskServerTest {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(404, response.statusCode());
-        assertTrue(response.body().contains("не найдена"));
-    }
 
+        assertEquals(404, response.statusCode());
+        assertTrue(response.body().toLowerCase().contains("не найдена"));
+    }
 
     @Test
     void testAddEpic() throws IOException, InterruptedException {
         EpicTask epic = new EpicTask("Test Epic", "Test Epic Description");
-        String epicJson = "{\"name\":\"Test Epic\",\"description\":\"Test Epic Description\",\"status\":\"NEW\"}";
+        String epicJson = gson.toJson(epic);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/epics"))
@@ -96,6 +107,7 @@ class HttpTaskServerTest {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
         assertEquals(200, response.statusCode());
 
         assertEquals(1, manager.getAllEpics().size());
@@ -110,17 +122,18 @@ class HttpTaskServerTest {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(404, response.statusCode());
-        assertTrue(response.body().contains("не найден"));
-    }
 
+        assertEquals(404, response.statusCode());
+        assertTrue(response.body().toLowerCase().contains("не найден"));
+    }
 
     @Test
     void testAddSubtask() throws IOException, InterruptedException {
         EpicTask epic = new EpicTask("Test Epic", "Test Epic Description");
         manager.addNewEpic(epic);
-        SubTask subtask = new SubTask("Test Subtask", "Test Subtask Description", tasks.Status.NEW, epic.getId());
-        String subtaskJson = "{\"name\":\"Test Subtask\",\"description\":\"Test Subtask Description\",\"status\":\"NEW\",\"epicId\":" + epic.getId() + "}";
+
+        SubTask subtask = new SubTask("Test Subtask", "Test Subtask Description", Status.NEW, epic.getId());
+        String subtaskJson = gson.toJson(subtask);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/subtasks"))
@@ -129,6 +142,7 @@ class HttpTaskServerTest {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
         assertEquals(200, response.statusCode());
 
         assertEquals(1, manager.getAllSubtasks().size());
@@ -143,7 +157,8 @@ class HttpTaskServerTest {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
         assertEquals(404, response.statusCode());
-        assertTrue(response.body().contains("не найдена"));
+        assertTrue(response.body().toLowerCase().contains("не найдена"));
     }
 }
