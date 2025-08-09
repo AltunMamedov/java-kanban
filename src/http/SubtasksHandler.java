@@ -77,14 +77,18 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
         String body = new String(input.readAllBytes(), StandardCharsets.UTF_8);
         SubTask subtask = gson.fromJson(body, SubTask.class);
 
-        if (subtask.getId() == 0 || manager.getSubTaskById(subtask.getId()) == null) {
-            manager.addNewSubtask(subtask);
-        } else {
-            manager.updateSubTask(subtask);
+        try {
+            if (subtask.getId() == 0 || manager.getSubTaskById(subtask.getId()) == null) {
+                manager.addNewSubtask(subtask);
+            } else {
+                manager.updateSubTask(subtask);
+            }
+            sendResponse(exchange, 201, gson.toJson(subtask));
+        } catch (IllegalArgumentException e) {
+            sendHasOverlaps(exchange, e.getMessage());
         }
-
-        sendText(exchange, "Подзадача сохранена: " + gson.toJson(subtask));
     }
+
 
     private void handleDelete(HttpExchange exchange, String query) throws IOException {
         if (query == null) {

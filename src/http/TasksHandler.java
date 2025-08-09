@@ -68,14 +68,18 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
         String body = new String(input.readAllBytes(), StandardCharsets.UTF_8);
         Task task = gson.fromJson(body, Task.class);
 
-        if (task.getId() == 0 || manager.getTaskById(task.getId()) == null) {
-            manager.addNewTask(task);
-            sendResponse(exchange, 201, gson.toJson(task));  // Created
-        } else {
-            manager.updateTask(task);
-            sendResponse(exchange, 201, gson.toJson(task));  // Updated
+        try {
+            if (task.getId() == 0 || manager.getTaskById(task.getId()) == null) {
+                manager.addNewTask(task);
+            } else {
+                manager.updateTask(task);
+            }
+            sendResponse(exchange, 201, gson.toJson(task));
+        } catch (IllegalArgumentException e) {
+            sendHasOverlaps(exchange, e.getMessage());
         }
     }
+
 
     private void handleDelete(HttpExchange exchange, String query) throws IOException {
         if (query == null) {

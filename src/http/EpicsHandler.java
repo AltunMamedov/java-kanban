@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.TaskManager;
 import tasks.EpicTask;
+import tasks.SubTask;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,15 +51,23 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
             List<EpicTask> epics = manager.getAllEpics();
             sendText(exchange, gson.toJson(epics));
         } else {
+            String path = exchange.getRequestURI().getPath();
             int id = parseId(query);
-            EpicTask epic = manager.getEpicById(id);
-            if (epic != null) {
-                sendText(exchange, gson.toJson(epic));
+
+            if (path.endsWith("/subtasks")) {
+                List<SubTask> subtasks = manager.getSubtasksByEpicId(id);
+                sendText(exchange, gson.toJson(subtasks));
             } else {
-                sendNotFound(exchange, "Эпик с id=" + id + " не найден.");
+                EpicTask epic = manager.getEpicById(id);
+                if (epic != null) {
+                    sendText(exchange, gson.toJson(epic));
+                } else {
+                    sendNotFound(exchange, "Эпик с id=" + id + " не найден.");
+                }
             }
         }
     }
+
 
     private void handlePost(HttpExchange exchange) throws IOException {
         InputStream input = exchange.getRequestBody();
