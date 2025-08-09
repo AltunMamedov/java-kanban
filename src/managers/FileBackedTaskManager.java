@@ -42,15 +42,23 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private String toStringForFile(Task task) {
         String epicId = "";
+        TaskType type;
+
         if (task instanceof SubTask) {
             epicId = String.valueOf(((SubTask) task).getEpicId());
+            type = TaskType.SUBTASK;
+        } else if (task instanceof EpicTask) {
+            type = TaskType.EPIC;
+        } else {
+            type = TaskType.TASK;
         }
+
         String startTime = task.getStartTime() != null ? task.getStartTime().toString() : "";
         String duration = task.getDuration() != null ? task.getDuration().toString() : "";
 
         return String.format("%d,%s,%s,%s,%s,%s,%s,%s",
                 task.getId(),
-                TaskType.TASK,
+                type,
                 task.getName(),
                 task.getStatus(),
                 task.getDescription(),
@@ -58,6 +66,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 startTime,
                 duration);
     }
+
 
     public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager manager = new FileBackedTaskManager(file);

@@ -7,9 +7,7 @@ import tasks.Task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -39,7 +37,6 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Task> getHistory() {
         return historyManager.getHistory();
     }
-
 
     @Override
     public ArrayList<EpicTask> getAllEpics() {
