@@ -143,7 +143,7 @@ class HttpTaskServerTest {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(200, response.statusCode());
+        assertEquals(201, response.statusCode());
 
         assertEquals(1, manager.getAllSubtasks().size());
         assertEquals("Test Subtask", manager.getAllSubtasks().get(0).getName());
